@@ -1,0 +1,17 @@
+FROM debian:latest
+
+RUN buildDeps='wget binutils xz-utils' \ 
+    && phddnsDeps='procps libc6:armhf libstdc++6:armhf' \
+    && phddnsSource="https://hsk.oray.com/download/download?id=25" \
+    && dpkg --add-architecture armhf\
+    && apt-get update \
+    && apt-get install -y $buildDeps $phddnsDeps \
+    && mkdir -p /root/oray \
+    && cd /root/oray \
+    && wget -O phddns.deb $phddnsSource \
+    && ar -x phddns.deb \
+    && tar -xvJf data.tar.xz \
+    && cp -r /root/oray/usr/orayapp /usr \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /root/oray \
+    && apt-get purge -y --auto-remove $buildDeps 
