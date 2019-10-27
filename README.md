@@ -25,7 +25,7 @@ $ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 - 如果是32位系统
 
 ```
-# echo "deb [arch=armhf] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian \
+$ echo "deb [arch=armhf] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian \
      $(lsb_release -cs) stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list
 ```
@@ -33,7 +33,7 @@ $ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 - 如果是64位系统
 
 ```
-# echo "deb [arch=arm64] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian \
+$ echo "deb [arch=arm64] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian \
      $(lsb_release -cs) stable" | \
     sudo tee /etc/apt/sources.list.d/docker.list
 ```
@@ -59,6 +59,11 @@ $ cat Dockerfile.aarch64 > Dockerfile
 $ cat Dockerfile.armhf > Dockerfile
 ```
 
+- 如果使用64位系统+qemu模拟运行程序
+
+```
+$ cat Dockerfile.aarch64-qemu > Dockerfile
+
 构建镜像
 
 ```
@@ -74,14 +79,17 @@ $ docker run -d \
       --restart=always \
       --mac-address=<mac-address> \
       --name=phddns \
-      phddns:v1 \
-      /bin/bash /usr/orayapp/phdaemon
+      phddns:v1 
 ```
 
-上面的`<mac-address>`和花生壳的SN号相关连，如果有付费过的账号，将mac改成对应机器网口的mac地址。
+上面的`<mac-address>`和花生壳的SN号相关联，尽量使用自己设定的Mac地址。如果需要查看SN号，请使用
+```
+docker logs phddns
+```
 
 ## 注意事项
-如果使用aarch架构的archlinuxarm或者部分cpu无法直接运行phddns，可以使用qemu模拟运行。aarch64架构的archlinuxarm可以使用该PKGBUILD构建的qemu-user-static-bin来运行。
+如果使用aarch64架构的archlinuxarm或者部分cpu无法直接运行phddns，可以使用qemu模拟运行。aarch64架构的archlinuxarm可以使用该PKGBUILD构建的qemu-user-static-bin来安装qemu-user-static，同时可以自动注册binfmt。
 ```
 https://gist.github.com/abelfodil/d0916511bfa3c75bc2e01dc79b045623
 ```
+现在添加了自带qemu-user-static的镜像构建。但是千万不要使用qemu模拟运行整个armhf架构的Debian镜像，这样会造成大量的性能消耗。
