@@ -63,6 +63,8 @@ $ cat Dockerfile.armhf > Dockerfile
 
 ```
 $ cat Dockerfile.aarch64-qemu > Dockerfile
+```
+
 
 构建镜像
 
