@@ -1,8 +1,9 @@
 FROM debian:latest
 
 WORKDIR /root/oray
+COPY phdaemon.patch ./phdaemon.patch
 
-RUN buildDeps='wget binutils xz-utils' \ 
+RUN buildDeps='wget binutils xz-utils patch' \ 
     && phddnsDeps='procps libc6:armhf libstdc++6:armhf' \
     && phddnsSource="https://hsk.oray.com/download/download?id=25" \
     && dpkg --add-architecture armhf\
@@ -11,7 +12,12 @@ RUN buildDeps='wget binutils xz-utils' \
     && wget -O phddns.deb $phddnsSource \
     && ar -x phddns.deb \
     && tar -xvJf data.tar.xz \
+    && patch usr/orayapp/phdaemon phdaemon.patch \
     && cp -r usr/orayapp /usr \
+    && apt-get download qemu-user-static \
+    && ar -x qemu-user-static* \
+    && tar -xvJf data.tar.xz \
+    && cp usr/bin/qemu-arm-static /usr/bin \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /root/oray \
     && apt-get purge -y --auto-remove $buildDeps 
